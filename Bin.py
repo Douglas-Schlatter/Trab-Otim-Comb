@@ -8,18 +8,19 @@ class Bin:
   
 def UpdateValue(self):
   self.currentValue = self.numberOfBalls*(self.numberOfBalls+1)/2
-  
+  return self.currentValue
 
 def SetBalls(self, targetNumBalls):
   self.numberOfBalls = targetNumBalls
-  UpdateValue(self)
+  return UpdateValue(self)
+  
 
 def IsValidToPut(self):
   if(self.numberOfBalls+1<=self.upperLimit):
     return True
   else:
     return False
-def IsValidToTake():
+def IsValidToTake(self):
   if(self.numberOfBalls-1>=self.lowerLimit):
     return True
   else:

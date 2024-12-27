@@ -57,6 +57,9 @@ function main()
 	@constraint(m, [i=1:binsTotal, j=2:bin[i,2]], x[i,j] <= x[i,(j-1)])
 	
 	@objective(m, Max, sum(x[i,j] * j for i in 1:binsTotal, j in 1:bin[i,2]))
+
+	set_attribute(m, "random_seed", 0)
+	set_optimizer_attribute(m, "time_limit", 300.0)
 	
 	optimize!(m)
 	@show objective_value(m)

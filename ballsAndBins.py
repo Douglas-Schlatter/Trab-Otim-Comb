@@ -75,7 +75,7 @@ def Border(solution):
                     diffJBinValue = abs(newJBinValue - oldJBinValue)
 
                     tagetISolution.value = solution.value - diffIBinValue + diffJBinValue # direnfeça de colocar aquela 
-                    neighbors.append(targetSolution)
+                    neighbors.append(tagetISolution)
                     pass
                 else:
                     #Não gera solução

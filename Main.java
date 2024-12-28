@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import Bin;
+import Solution;
 
 
 public class Main {

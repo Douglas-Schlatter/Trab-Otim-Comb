@@ -5,13 +5,14 @@ public class Bin {
     private int numberOfBalls;
     private double currentValue;
 
-    public Bin(int id, int lowerLimit, int upperLimit,int numberOfBalls,int currentValue) {
+    public Bin(int id, int lowerLimit, int upperLimit,int numberOfBalls) {
         this.id = id;
         this.lowerLimit = lowerLimit;
         this.upperLimit = upperLimit;
         this.numberOfBalls = numberOfBalls;
-        this.currentValue = currentValue;
+        this.currentValue = 0;
     }
+    
     public Bin(int id, int lowerLimit, int upperLimit) {
         this.id = id;
         this.lowerLimit = lowerLimit;

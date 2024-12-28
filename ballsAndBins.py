@@ -10,7 +10,7 @@ e o limite superior do recipiente i, respectivamente.'''
 #Dicionário de bins, chave = id, contem tupla (lower bound e upper bound)
 binDict = {}
 
-def SortPerLowerBound(binList):
+def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
     if len(binList) > 1:
   
         mid = len(binList)//2
@@ -47,17 +47,17 @@ def SortPerLowerBound(binList):
   
     return binList
 
-def CalculateSolValue(solucao):
+def CalculateSolValue(solucao: list[tuple[int, int, int]]) -> int:
     iValue = 0
     for iBin in solucao:
-        iValue += iBin[0]
+        iValue += CalculateBinValue(iBin[1])
     return iValue
 
-def CalculateBinValue(balls):
+def CalculateBinValue(balls: int) -> int:
     return int((balls*(balls+1))/2)
 
 #Vizinhança
-def Border(solution, listSolution):
+def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list[Solution]:
 
     neighbors = []
     #tagetSolution = copy.deepcopy(solution) # tem que verificar se é uma deep copy msm -> TODO talvez isso custe mto processamento
@@ -66,30 +66,32 @@ def Border(solution, listSolution):
     # iBin[0] = valor
     # iBin[1] = número de bolas
     # iBin[2] = id
-    for iBin in targetSolution.bins:
+    for takenBin in targetSolution.bins:
         #targetISolution = Solution.Solution(solution.value,listSolution.copy()) # reseta solution copy
         # Se número de bolas for maior que o mínimo do bin desse id
-        if(iBin[1] > binDict[iBin[2]][0]):
+        if(takenBin[1] > binDict[takenBin[2]] [0]):
             #gera solution
-            for jBin in targetSolution.bins: 
+            for receiveBin in targetSolution.bins: 
                 #targetISolution = Solution.Solution(solution.value,listSolution.copy()) # reseta solution copy
-                if(jBin[2] == iBin[2]):# se eles têm o mesmo id, n faz mto sentido tu tirar e colocar no mesmo bin
+                if(receiveBin[2] == takenBin[2]):# se eles têm o mesmo id, n faz mto sentido tu tirar e colocar no mesmo bin
                     #Não gera solução
                     continue
                  # Se número de bolas for menor que o máximo do bin desse id
-                elif(jBin[1] < binDict[jBin[2]][1]):
+                elif(receiveBin[1] < binDict[receiveBin[2]] [1]):
                     #Gera Solution
 
                     newSol = listSolution.copy()
 
-                    newSol.remove(iBin)
-                    newSol.remove(jBin)
-                    newBin = (CalculateBinValue(iBin[1]-1), iBin[1]-1, iBin[2])
-                    newBin2 = (CalculateBinValue(jBin[1]+1), jBin[1]+1, jBin[2])
+                    newSol.remove(takenBin)
+                    newSol.remove(receiveBin)
+                    #newBin = (CalculateBinValue(takenBin[1]-1), takenBin[1]-1, takenBin[2])
+                    newBin = (0, takenBin[1]-1, takenBin[2])
+                    #newBin2 = (CalculateBinValue(receiveBin[1]+1), receiveBin[1]+1, receiveBin[2])
+                    newBin2 = (0, receiveBin[1]+1, receiveBin[2])
                     newSol.append(newBin)
                     newSol.append(newBin2)
 
-                    targetISolution = Solution.Solution(solution.value - iBin[1] - 1 + jBin[1], newSol) # direnfeça de colocar aquela 
+                    targetISolution = Solution.Solution(solution.value - takenBin[1] + receiveBin[1]+1, newSol) # direnfeça de colocar aquela 
                     targetISolution.bins = newSol
                     neighbors.append(targetISolution)
                     pass
@@ -104,7 +106,7 @@ def Border(solution, listSolution):
     return neighbors
 
 #Calcula a primeira solução para ser iterada pelo late hill climbing
-def CalculateFirstSol(sortedList, numBalls, currentBalls):
+def CalculateFirstSol(sortedList: list[tuple[int, int, int]], numBalls: int, currentBalls: int) -> Solution:
 
     initialSol = sortedList
     # Quantas bolas faltam serem adicionadas
@@ -119,7 +121,8 @@ def CalculateFirstSol(sortedList, numBalls, currentBalls):
                 if (value <= missingBalls):
                     initialSol.remove(bin)
                     missingBalls -= value
-                    bin = (CalculateBinValue(binDict[bin[2]] [1]), binDict[bin[2]] [1], bin[2])
+                    #bin = (CalculateBinValue(binDict[bin[2]] [1]), binDict[bin[2]] [1], bin[2])
+                    bin = (0, binDict[bin[2]] [1], bin[2])
                     initialSol.append(bin)
 
                 else:
@@ -127,13 +130,14 @@ def CalculateFirstSol(sortedList, numBalls, currentBalls):
                     # Se value for menor que missingBalls, pode adicionar só a diferença
                     addedBalls = bin[1] + missingBalls
                     missingBalls -= missingBalls
-                    bin = (CalculateBinValue(addedBalls), addedBalls, bin[2])
+                    #bin = (CalculateBinValue(addedBalls), addedBalls, bin[2])
+                    bin = (0, addedBalls, bin[2])
                     initialSol.append(bin)
                     break
 
     return Solution.Solution(CalculateSolValue(initialSol), initialSol)
 
-def BuscaLocal(solucao):
+def BuscaLocal(solucao: Solution) -> Solution:
     bestValue = solucao.value
     bestSol = solucao
     
@@ -154,7 +158,7 @@ file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
 lines = file.readlines()
 
 #Lista de bins contendo um index, lower bound e upper bound
-currentBinList = []
+#currentBinList = []
 
 #Dicionário de bins, chave = id, contem tupla (lower bound e upper bound)
 #binDict = {}   #Declarado la em cima pra ser global
@@ -175,10 +179,11 @@ for index in range(2,len(lines)):
     targetBin = Bin.Bin((index-1),int(targetLine[0]),int(targetLine[1]))
     binDict[(index-1)] = (int(targetLine[0]),int(targetLine[1]))
     #Bin.SetBalls(targetBin,100)
-    currentBinList.append(targetBin)
-    teste = int(targetLine[0])
-    currentBalls += teste
-    currentSolList.append((int(teste*(teste+1)/2), teste, (index-1)))
+    #currentBinList.append(targetBin)
+    minBalls = int(targetLine[0])   # Adiciona quantidade de bolas mínimas ao bin para ser válido
+    currentBalls += minBalls
+    #currentSolList.append((CalculateBinValue(minBalls), minBalls, (index-1)))
+    currentSolList.append((0, minBalls, (index-1)))
 
 sortedList = SortPerLowerBound(currentSolList)
 
@@ -186,9 +191,9 @@ targetSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
    #print(targetBin.id, " ",targetBin.lowerLimit)
 
-print("TargetSolution")
+print("initialSolution")
 for bin in targetSolution.bins:
-     print(bin[2], " ",bin,end='| ')
+     print(bin,end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
 print(targetSolution.value)
 
@@ -197,19 +202,21 @@ print(" ")
 buscaLocal = BuscaLocal(targetSolution)
 
 print("BuscaLocal valor")
-for bin in buscaLocal.bins:
-     print(bin[2], " ",bin,end='| ')
+#for bin in buscaLocal.bins:
+#     print(bin,end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-print(buscaLocal.value)
+print("")
+print("busca local: ", buscaLocal.value)
+print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 '''
 print("Vizinhos")
 vizinhos = Border(targetSolution, sortedList)
 for i in range(0,len(vizinhos)):
     print(" ")
-    print("Sol ", i)
+    print("Sol", i, "=", vizinhos[i].value)
     for iBin in vizinhos[i].bins:
-        print("(",iBin[2], ",",iBin[1], ")",end='| ')
+        print(f"({iBin[2]})= {iBin[1]}",end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
 print(len(vizinhos))
 #for iBin in sortedList:

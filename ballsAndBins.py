@@ -1,6 +1,7 @@
 import Bin
 import Solution
 import copy
+from collections import deque 
 '''A primeira linha do arquivo informa o n´umero de
 recipientes (n). A segunda linha do arquivo informa o n´umero de bolas
 m. Cada linha a partir da terceira linha do arquivo at´e a linha n + 2
@@ -68,7 +69,7 @@ def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list
     # iBin[2] = id
     for takenBin in targetSolution.bins:
         #targetISolution = Solution.Solution(solution.value,listSolution.copy()) # reseta solution copy
-        # Se número de bolas for maior que o mínimo do bin desse id
+        # Se número de bolas for maior que o mínimo do bin desse id-> ele eh um bin valido pára pegar
         if(takenBin[1] > binDict[takenBin[2]] [0]):
             #gera solution
             for receiveBin in targetSolution.bins: 
@@ -76,7 +77,7 @@ def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list
                 if(receiveBin[2] == takenBin[2]):# se eles têm o mesmo id, n faz mto sentido tu tirar e colocar no mesmo bin
                     #Não gera solução
                     continue
-                 # Se número de bolas for menor que o máximo do bin desse id
+                 # Se número de bolas for menor que o máximo do bin desse id -> ele eh um bin valido de colocar
                 elif(receiveBin[1] < binDict[receiveBin[2]] [1]):
                     #Gera Solution
 
@@ -92,7 +93,7 @@ def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list
                     newSol.append(newBin2)
 
                     targetISolution = Solution.Solution(solution.value - takenBin[1] + receiveBin[1]+1, newSol) # direnfeça de colocar aquela 
-                    targetISolution.bins = newSol
+                    targetISolution.bins = newSol # talvez nao precise pq ja criamos ela com new sol TODO revisar
                     neighbors.append(targetISolution)
                     pass
                 else:
@@ -106,16 +107,19 @@ def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list
     return neighbors
 
 #Calcula a primeira solução para ser iterada pelo late hill climbing
+    # iBin[0] = valor
+    # iBin[1] = número de bolas
+    # iBin[2] = id
 def CalculateFirstSol(sortedList: list[tuple[int, int, int]], numBalls: int, currentBalls: int) -> Solution:
 
-    initialSol = sortedList
+    initialSol = sortedList # -> talvez aqui valha a pena ser deepcopy por que pode loopar por causa da linha que esta escrito AQUI
     # Quantas bolas faltam serem adicionadas
     missingBalls = numBalls - currentBalls
     while(missingBalls > 0):
         for bin in sortedList:
             # Quantidade de bolas adicionadas é igual o máximo - atual
             value = binDict[bin[2]] [1] - bin[1]
-            # Se o máximo - atual > 0, então pode adicionar
+            # Se o máximo - atual > 0, então pode adicionar (ou seja é um bin valido para colocar na nomenclatura antiga)
             if (value > 0):
                 # Se value for menor que missingBalls, pode adicionar todas
                 if (value <= missingBalls):
@@ -123,13 +127,13 @@ def CalculateFirstSol(sortedList: list[tuple[int, int, int]], numBalls: int, cur
                     missingBalls -= value
                     #bin = (CalculateBinValue(binDict[bin[2]] [1]), binDict[bin[2]] [1], bin[2])
                     bin = (0, binDict[bin[2]] [1], bin[2])
-                    initialSol.append(bin)
+                    initialSol.append(bin)  #AQUI é readicionado aquele bin a lista
 
                 else:
                     initialSol.remove(bin)
                     # Se value for menor que missingBalls, pode adicionar só a diferença
                     addedBalls = bin[1] + missingBalls
-                    missingBalls -= missingBalls
+                    missingBalls -= missingBalls # TODO CONFERIR SE NAO ESTAMOS ADICIONANDO BOLAS QUE NAO EXISTEM
                     #bin = (CalculateBinValue(addedBalls), addedBalls, bin[2])
                     bin = (0, addedBalls, bin[2])
                     initialSol.append(bin)
@@ -152,6 +156,10 @@ def BuscaLocal(solucao: Solution) -> Solution:
                 #break # First ou best improvement?
     return bestSol
 
+def LateAcceptanceHillClimbing():
+    return 0
+
+
 
 # Open the file in read mode
 file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
@@ -169,8 +177,8 @@ currentSolList = []
 # Read each line in the file
 numBins = int(lines[0])
 numBalls = int(lines[1])
-
-# Quantas bolas foram colocadas em cada bin (o mínimo)
+banana = input("Teste da banana: ")
+# Quantas bolas que ja foram alocadas em bins (o mínimo para aquele bin ser valido)
 currentBalls = 0
 for index in range(2,len(lines)):
     #print(index)
@@ -189,7 +197,6 @@ sortedList = SortPerLowerBound(currentSolList)
 
 targetSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
-   #print(targetBin.id, " ",targetBin.lowerLimit)
 
 print("initialSolution")
 for bin in targetSolution.bins:
@@ -208,6 +215,22 @@ print("BuscaLocal valor")
 print("")
 print("busca local: ", buscaLocal.value)
 print("valor real: ", CalculateSolValue(buscaLocal.bins))
+
+# LateAcceptanceHillClimbing
+sizeOfAcceptQueue= 4
+acceptenceQueue = deque(sizeOfAcceptQueue)
+bestSolution = buscaLocal
+bestSolValue = buscaLocal.value
+acceptenceQueue.append()
+interatorCount = 0
+stopInteration = 10000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
+while(interatorCount<stopInteration):
+    targetSolution = Solution.Solution(bestSolution.value,bestSolution.copy())
+
+
+    stopInteration+=1
+
+#tem que fazer uma logica para o menor falor sempre ficar num extremo da queue 
 
 '''
 print("Vizinhos")

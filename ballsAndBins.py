@@ -218,6 +218,8 @@ print(initialSolution.value)
 
 print(" ")
 
+#Antes estavamos executando a buscaLocal para comparar com nossa heuristica
+'''
 buscaLocal = BuscaLocal(initialSolution)
 
 print("BuscaLocal valor")
@@ -227,6 +229,7 @@ print("BuscaLocal valor")
 print("")
 print("busca local: ", buscaLocal.value)
 print("valor real: ", CalculateSolValue(buscaLocal.bins))
+'''
 
 
 
@@ -278,7 +281,7 @@ while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.ti
                     lastIterationImprovement = interatorCount
                     melhorou = True
     interatorCount+=1
-
+timeAtStopExecution = time.time()
 print("")
 #Abaixo alguns prints monstrando qual foi o motivo da parada
 if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por limite de iterações sem melhora
@@ -286,7 +289,7 @@ if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por li
     print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
 elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
     print("Parada ocorreu por que chegamos no tempo maximo de execução")
-    print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+    print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
 
 print("")
 print("bestSolution")
@@ -294,8 +297,9 @@ for bin in bestSolution.bins:
      print(bin,end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
 print(bestSolution.value)
-#tem que fazer uma logica para o menor falor sempre ficar num extremo da queue 
-print("busca local: ", buscaLocal.value)
+
+#Comparação com busca local
+#print("busca local: ", buscaLocal.value)
 
 '''
 print("Vizinhos")

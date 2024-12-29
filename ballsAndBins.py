@@ -3,6 +3,7 @@ import Solution
 import copy
 from collections import deque 
 import heapq
+import time
 '''A primeira linha do arquivo informa o n´umero de
 recipientes (n). A segunda linha do arquivo informa o n´umero de bolas
 m. Cada linha a partir da terceira linha do arquivo at´e a linha n + 2
@@ -163,7 +164,7 @@ def LateAcceptanceHillClimbing():
 
 
 # Open the file in read mode
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/03.txt', 'r')
+file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/02.txt', 'r')
 lines = file.readlines()
 
 #Lista de bins contendo um index, lower bound e upper bound
@@ -220,18 +221,23 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 
 # LateAcceptanceHillClimbing
-sizeOfAcceptHeap= 4
+sizeOfAcceptHeap= int(input("Qual sera o tamanho do heap de aceitacao do LAHC?: "))
 acceptenceHeap = []
 bestSolution = initialSolution
 bestSolValue = initialSolution.value
 acceptenceHeap.append(bestSolValue)
 heapq.heapify(acceptenceHeap)
 interatorCount = 0
-stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
+#stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
+stopInteration = int(input("Qual eh a quantidade maxima de iteracoes?: "))
 targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
-while(interatorCount<stopInteration): #TODO aqui ainda precisa colocar a verificação de tempo
+start = time.time()
+print(start)
+timeLimit = 300
+#while((interatorCount<stopInteration) and ((start - (time.time()))>timeLimit)): #TODO aqui ainda precisa colocar a verificação de tempo
+while((interatorCount<stopInteration) and ((time.time()-start)<timeLimit)):
     #Busca local com alteracoes
-    
+    print(time.time())
     melhorou = True
     while(melhorou):
         melhorou = False
@@ -250,7 +256,8 @@ while(interatorCount<stopInteration): #TODO aqui ainda precisa colocar a verific
                     melhorou = True
                 #break # First ou best improvement?
     interatorCount+=1
-
+print(start - (time.time()))
+    
 print("")
 print("bestSolution")
 for bin in bestSolution.bins:

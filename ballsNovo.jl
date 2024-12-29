@@ -17,6 +17,8 @@ Pkg.instantiate()
 using JuMP
 using HiGHS
 
+
+# julia ballsNovo.jl 01.txt seed tempo
 function main()
 	m = Model(HiGHS.Optimizer)
 	
@@ -58,15 +60,15 @@ function main()
 	
 	@objective(m, Max, sum(x[i,j] * j for i in 1:binsTotal, j in 1:bin[i,2]))
 
-	set_attribute(m, "random_seed", 0)
-	set_optimizer_attribute(m, "time_limit", 300.0)
+	set_attribute(m, "random_seed", parse(Int,ARGS[2]))
+	set_optimizer_attribute(m, "time_limit", parse(Float16,ARGS[3]))
 	
 	optimize!(m)
 	@show objective_value(m)
-	for i in 1:binsTotal
-		print(i, ": ");
-		@show value(sum(x[i,:]));
-	end
+	#for i in 1:binsTotal
+	#	print(i, ": ");
+	#	@show value(sum(x[i,:]));
+	#end
 	
 end
 

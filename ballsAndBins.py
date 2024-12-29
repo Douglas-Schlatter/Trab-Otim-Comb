@@ -2,6 +2,7 @@ import Bin
 import Solution
 import copy
 from collections import deque 
+import heapq
 '''A primeira linha do arquivo informa o n´umero de
 recipientes (n). A segunda linha do arquivo informa o n´umero de bolas
 m. Cada linha a partir da terceira linha do arquivo at´e a linha n + 2
@@ -162,7 +163,7 @@ def LateAcceptanceHillClimbing():
 
 
 # Open the file in read mode
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
+file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/03.txt', 'r')
 lines = file.readlines()
 
 #Lista de bins contendo um index, lower bound e upper bound
@@ -219,41 +220,45 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 
 # LateAcceptanceHillClimbing
-sizeOfAcceptQueue= 4
-acceptenceQueue = deque([], maxlen=sizeOfAcceptQueue)
+sizeOfAcceptHeap= 4
+acceptenceHeap = []
 bestSolution = initialSolution
 bestSolValue = initialSolution.value
-acceptenceQueue.append(bestSolValue)
+acceptenceHeap.append(bestSolValue)
+heapq.heapify(acceptenceHeap)
 interatorCount = 0
-stopInteration = 10000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
+stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
+targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
 while(interatorCount<stopInteration): #TODO aqui ainda precisa colocar a verificação de tempo
-    targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
     #Busca local com alteracoes
+    
     melhorou = True
     while(melhorou):
         melhorou = False
         for vizinho in Border(targetSolution, targetSolution.bins):
-                #Se a queue ainda não esta cheia -> sim-> so adicione de maneira ordenada
-            if(len(acceptenceQueue)<acceptenceQueue.maxlen):
-                for i in range(0,len(acceptenceQueue)):
-                    #se o que achamos é maior que o valor em i
-                    if(vizinho.value>acceptenceQueue[i]):
-                        
-                        if(i == 0):
-                            #se i ==0 estamos no inicio da deque, logo precisamos rotacionar para adicionar a esquerda
-                            deque.rotate(1)
-                            deque.appendleft(vizinho.value)
-                        elif(i ==1):
-                            banana=0
-            if vizinho.value > bestValue:
-                bestValue = vizinho.value
-                bestSol = vizinho
-                melhorou = True
+                #Ta sobrando espaço = so adicionar
+            if(len(acceptenceHeap)<sizeOfAcceptHeap):
+                heapq.heappush(acceptenceHeap,vizinho.value)
+            elif(acceptenceHeap[0]< vizinho.value):
+                heapq.heappop(acceptenceHeap)
+                heapq.heappush(acceptenceHeap,vizinho.value)
+                targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
+                if(bestSolValue<vizinho.value):
+                    print("Nova melhor sol", vizinho.value,"Meu heap é",acceptenceHeap) 
+                    bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
+                    bestSolValue = bestSolution.value
+                    melhorou = True
                 #break # First ou best improvement?
-
     interatorCount+=1
 
+print("")
+print("bestSolution")
+for bin in bestSolution.bins:
+     print(bin,end='| ')
+        #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
+print(bestSolution.value)
 #tem que fazer uma logica para o menor falor sempre ficar num extremo da queue 
+print("busca local: ", buscaLocal.value)
 
 '''
 print("Vizinhos")

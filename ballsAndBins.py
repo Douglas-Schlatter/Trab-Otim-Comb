@@ -143,7 +143,7 @@ def CalculateFirstSol(sortedList: list[tuple[int, int, int]], numBalls: int, cur
 
 def BuscaLocal(solucao: Solution) -> Solution:
     bestValue = solucao.value
-    bestSol = solucao
+    bestSol = Solution.Solution(solucao.value,solucao.bins.copy())
     
     melhorou = True
     while(melhorou):
@@ -177,7 +177,7 @@ currentSolList = []
 # Read each line in the file
 numBins = int(lines[0])
 numBalls = int(lines[1])
-banana = input("Teste da banana: ")
+
 # Quantas bolas que ja foram alocadas em bins (o mínimo para aquele bin ser valido)
 currentBalls = 0
 for index in range(2,len(lines)):
@@ -195,18 +195,18 @@ for index in range(2,len(lines)):
 
 sortedList = SortPerLowerBound(currentSolList)
 
-targetSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
+initialSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
 
 print("initialSolution")
-for bin in targetSolution.bins:
+for bin in initialSolution.bins:
      print(bin,end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-print(targetSolution.value)
+print(initialSolution.value)
 
 print(" ")
 
-buscaLocal = BuscaLocal(targetSolution)
+buscaLocal = BuscaLocal(initialSolution)
 
 print("BuscaLocal valor")
 #for bin in buscaLocal.bins:
@@ -216,19 +216,42 @@ print("")
 print("busca local: ", buscaLocal.value)
 print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
+
+
 # LateAcceptanceHillClimbing
 sizeOfAcceptQueue= 4
-acceptenceQueue = deque(sizeOfAcceptQueue)
-bestSolution = buscaLocal
-bestSolValue = buscaLocal.value
-acceptenceQueue.append()
+acceptenceQueue = deque([], maxlen=sizeOfAcceptQueue)
+bestSolution = initialSolution
+bestSolValue = initialSolution.value
+acceptenceQueue.append(bestSolValue)
 interatorCount = 0
 stopInteration = 10000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
-while(interatorCount<stopInteration):
-    targetSolution = Solution.Solution(bestSolution.value,bestSolution.copy())
+while(interatorCount<stopInteration): #TODO aqui ainda precisa colocar a verificação de tempo
+    targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
+    #Busca local com alteracoes
+    melhorou = True
+    while(melhorou):
+        melhorou = False
+        for vizinho in Border(targetSolution, targetSolution.bins):
+                #Se a queue ainda não esta cheia -> sim-> so adicione de maneira ordenada
+            if(len(acceptenceQueue)<acceptenceQueue.maxlen):
+                for i in range(0,len(acceptenceQueue)):
+                    #se o que achamos é maior que o valor em i
+                    if(vizinho.value>acceptenceQueue[i]):
+                        
+                        if(i == 0):
+                            #se i ==0 estamos no inicio da deque, logo precisamos rotacionar para adicionar a esquerda
+                            deque.rotate(1)
+                            deque.appendleft(vizinho.value)
+                        elif(i ==1):
+                            banana=0
+            if vizinho.value > bestValue:
+                bestValue = vizinho.value
+                bestSol = vizinho
+                melhorou = True
+                #break # First ou best improvement?
 
-
-    stopInteration+=1
+    interatorCount+=1
 
 #tem que fazer uma logica para o menor falor sempre ficar num extremo da queue 
 

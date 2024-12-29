@@ -164,7 +164,7 @@ def LateAcceptanceHillClimbing():
 
 
 # Open the file in read mode
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/02.txt', 'r')
+file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
 lines = file.readlines()
 
 #Lista de bins contendo um index, lower bound e upper bound
@@ -199,6 +199,16 @@ sortedList = SortPerLowerBound(currentSolList)
 
 initialSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
+#Prints Necessarios:
+'''Ap´os a gera¸c˜ao da solu¸c˜ao inicial, e toda a vez que implementa¸c˜ao
+encontra uma solu¸c˜ao melhor que a melhor conhecida at´e o momento, esta deve escrever na sa´ıda padr˜ao: (i) a quantidade de
+segundos (com duas casas ap´os a v´ırgula) desde o come¸co da
+execu¸c˜ao; (ii) o valor dessa solu¸c˜ao; (iii) uma representa¸c˜ao da
+mesma que seja poss´ıvel de ser compreendida por um ser humano. Al´em disso, a implementa¸c˜ao tamb´em deve escrever na
+sa´ıda padr˜ao quaisquer outras inform¸c˜oes usadas para montagem
+das tabelas do relat´orio.
+'''
+
 
 print("initialSolution")
 for bin in initialSolution.bins:
@@ -221,23 +231,34 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 
 # LateAcceptanceHillClimbing
+
+#Preparação do Heap do LAHC e Melhor solução
+#Tamanho do Heap que guarda as melhores valores de solução
 sizeOfAcceptHeap= int(input("Qual sera o tamanho do heap de aceitacao do LAHC?: "))
 acceptenceHeap = []
+#Copiamos os valores apartir das solução inicial gerada
 bestSolution = initialSolution
 bestSolValue = initialSolution.value
 acceptenceHeap.append(bestSolValue)
 heapq.heapify(acceptenceHeap)
+#Colocamos a solução inicial como a solução que procuraremos a primeira vizinhança
+targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
+
+#Relacionado as iterações -> Estamos fazendo a logica de x iterações sem melhora
 interatorCount = 0
 #stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
-stopInteration = int(input("Qual eh a quantidade maxima de iteracoes?: "))
-targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
-start = time.time()
-print(start)
-timeLimit = 300
+lastIterationImprovement = 0
+stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhora?: "))
+
+
+#Relacionado a tempo
+timeStart = time.time()
+print(timeStart)
+timeLimit = int(input("Qual sera o tempo maximo?: "))
 #while((interatorCount<stopInteration) and ((start - (time.time()))>timeLimit)): #TODO aqui ainda precisa colocar a verificação de tempo
-while((interatorCount<stopInteration) and ((time.time()-start)<timeLimit)):
+while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.time()-timeStart)<timeLimit)):
     #Busca local com alteracoes
-    print(time.time())
+    #print(time.time())
     melhorou = True
     while(melhorou):
         melhorou = False
@@ -245,7 +266,7 @@ while((interatorCount<stopInteration) and ((time.time()-start)<timeLimit)):
                 #Ta sobrando espaço = so adicionar
             if(len(acceptenceHeap)<sizeOfAcceptHeap):
                 heapq.heappush(acceptenceHeap,vizinho.value)
-            elif(acceptenceHeap[0]< vizinho.value):
+            elif(acceptenceHeap[0]<= vizinho.value):
                 heapq.heappop(acceptenceHeap)
                 heapq.heappush(acceptenceHeap,vizinho.value)
                 targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
@@ -253,11 +274,20 @@ while((interatorCount<stopInteration) and ((time.time()-start)<timeLimit)):
                     print("Nova melhor sol", vizinho.value,"Meu heap é",acceptenceHeap) 
                     bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
                     bestSolValue = bestSolution.value
+
+                    lastIterationImprovement = interatorCount
                     melhorou = True
-                #break # First ou best improvement?
     interatorCount+=1
-print(start - (time.time()))
-    
+
+print("")
+#Abaixo alguns prints monstrando qual foi o motivo da parada
+if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por limite de iterações sem melhora
+    print("Parada ocorreu por que chegamos na quantidade maxima de iteração sem melhora")
+    print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
+    print("Parada ocorreu por que chegamos no tempo maximo de execução")
+    print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+
 print("")
 print("bestSolution")
 for bin in bestSolution.bins:

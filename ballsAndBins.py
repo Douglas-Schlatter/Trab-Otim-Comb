@@ -161,7 +161,10 @@ def BuscaLocal(solucao: Solution) -> Solution:
 def LateAcceptanceHillClimbing():
     return 0
 
+def printOnNewBestSolution(currentTime,newBestSol: Solution,):
 
+    for bin in newBestSol.bins:
+     print(bin,end='| ')
 
 # Open the file in read mode
 file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
@@ -195,8 +198,20 @@ for index in range(2,len(lines)):
     #currentSolList.append((CalculateBinValue(minBalls), minBalls, (index-1)))
     currentSolList.append((0, minBalls, (index-1)))
 
-sortedList = SortPerLowerBound(currentSolList)
+#Antes de Começar a contagem do tempo o usuario deve inserir os parametros de execução
 
+#Tamanho do Heap que guarda as melhores valores de solução
+sizeOfAcceptHeap= int(input("Qual sera o tamanho do heap de aceitacao do LAHC?: "))
+
+#Tamanho do Heap que guarda as melhores valores de solução
+stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhora?: "))
+
+#Relacionado a tempo
+timeLimit = int(input("Qual sera o tempo maximo?: "))
+
+#Inicio da contagem de tempo do programa, decidimos colocar aqui, pois aqui que a meta-heuristica começa de fato
+timeStart = time.time()
+sortedList = SortPerLowerBound(currentSolList)
 initialSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
 #Prints Necessarios:
@@ -236,8 +251,7 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 # LateAcceptanceHillClimbing
 
 #Preparação do Heap do LAHC e Melhor solução
-#Tamanho do Heap que guarda as melhores valores de solução
-sizeOfAcceptHeap= int(input("Qual sera o tamanho do heap de aceitacao do LAHC?: "))
+
 acceptenceHeap = []
 #Copiamos os valores apartir das solução inicial gerada
 bestSolution = initialSolution
@@ -251,14 +265,11 @@ targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
 interatorCount = 0
 #stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
 lastIterationImprovement = 0
-stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhora?: "))
+
 
 
 #Relacionado a tempo
-timeStart = time.time()
-print(timeStart)
-timeLimit = int(input("Qual sera o tempo maximo?: "))
-#while((interatorCount<stopInteration) and ((start - (time.time()))>timeLimit)): #TODO aqui ainda precisa colocar a verificação de tempo
+
 while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.time()-timeStart)<timeLimit)):
     #Busca local com alteracoes
     #print(time.time())
@@ -292,11 +303,14 @@ elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo
     print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
 
 print("")
+print("Initial Sol Value: ",initialSolution.value)
+print("Best Sol Value: ",bestSolution.value)
 print("bestSolution")
 for bin in bestSolution.bins:
      print(bin,end='| ')
         #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-print(bestSolution.value)
+
+#print(bestSolution.value)
 
 #Comparação com busca local
 #print("busca local: ", buscaLocal.value)

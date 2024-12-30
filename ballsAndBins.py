@@ -252,12 +252,11 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 #Preparação do Heap do LAHC e Melhor solução
 
-acceptenceHeap = []
+acceptenceQueue = deque()
 #Copiamos os valores apartir das solução inicial gerada
 bestSolution = initialSolution
 bestSolValue = initialSolution.value
-acceptenceHeap.append(bestSolValue)
-heapq.heapify(acceptenceHeap)
+acceptenceQueue.append(bestSolValue)
 #Colocamos a solução inicial como a solução que procuraremos a primeira vizinhança
 targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
 
@@ -273,24 +272,20 @@ lastIterationImprovement = 0
 while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.time()-timeStart)<timeLimit)):
     #Busca local com alteracoes
     #print(time.time())
-    melhorou = True
-    while(melhorou):
-        melhorou = False
-        for vizinho in Border(targetSolution, targetSolution.bins):
-                #Ta sobrando espaço = so adicionar
-            if(len(acceptenceHeap)<sizeOfAcceptHeap):
-                heapq.heappush(acceptenceHeap,vizinho.value)
-            elif(acceptenceHeap[0]<= vizinho.value):
-                heapq.heappop(acceptenceHeap)
-                heapq.heappush(acceptenceHeap,vizinho.value)
-                targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
-                if(bestSolValue<vizinho.value):
-                    print("Nova melhor sol", vizinho.value,"Meu heap é",acceptenceHeap) 
-                    bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
-                    bestSolValue = bestSolution.value
+    for vizinho in Border(targetSolution, targetSolution.bins):
+            #Ta sobrando espaço = so adicionar
+        if((acceptenceQueue[-1] <= vizinho.value) or (vizinho.value >= targetSolution.value)):
+            if(len(acceptenceQueue) == sizeOfAcceptHeap):
+                acceptenceQueue.pop()
+            acceptenceQueue.appendleft(vizinho.value)
+            #print(acceptenceQueue)
+            targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
+            if(bestSolValue<vizinho.value):
+                print("Nova melhor sol", vizinho.value,"Meu heap é",acceptenceQueue) 
+                bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
+                bestSolValue = bestSolution.value
 
-                    lastIterationImprovement = interatorCount
-                    melhorou = True
+                lastIterationImprovement = interatorCount
     interatorCount+=1
 timeAtStopExecution = time.time()
 print("")

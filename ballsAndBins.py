@@ -164,10 +164,34 @@ def BuscaLocal(solucao: Solution) -> Solution:
 
 
 
-def printOnNewBestSolution(currentTime,newBestSol: Solution,):
-    print()
+#Prints Necessarios:
+'''Ap´os a gera¸c˜ao da solu¸c˜ao inicial, e toda a vez que implementa¸c˜ao
+encontra uma solu¸c˜ao melhor que a melhor conhecida at´e o momento, esta deve escrever na sa´ıda padr˜ao: (i) a quantidade de
+segundos (com duas casas ap´os a v´ırgula) desde o come¸co da
+execu¸c˜ao; (ii) o valor dessa solu¸c˜ao; (iii) uma representa¸c˜ao da
+mesma que seja poss´ıvel de ser compreendida por um ser humano. Al´em disso, a implementa¸c˜ao tamb´em deve escrever na
+sa´ıda padr˜ao quaisquer outras inform¸c˜oes usadas para montagem
+das tabelas do relat´orio.
+'''
+
+#Função utilizada no print a cada melhor solução e tambem na solução inicial
+def printOnNewBestSolution(isFirstSol,currentTime,numIteracoes,newBestSol: Solution,):
+    #Se sim, eh a solução inicial
+    if(isFirstSol):
+        print("Tempo Atual no momento do calculo da solução inicial: {:.2f}".format(currentTime))
+        #print("Iteracao atual no momento do calculo da solução inicial: ")
+    #Se não, encontrou uma solução melhor e precisamos printar
+    else:
+        print("Nova melhor solução encontrada")
+        print("Tempo Atual no momento da melhoria: {:.2f}".format(currentTime))
+        print("Quantidade total de iteracoes no momento da melhoria: ",numIteracoes)
+    
+    print("Valor da solucao atual: ", newBestSol.value)
+    print("Representacao da solucao atual: ")
+
     for bin in newBestSol.bins:
-     print(bin,end='| ')
+     print(bin[2],",",bin[1],end='| ')
+    print("")
 
 
 lines = file.readlines()
@@ -216,15 +240,7 @@ timeStart = time.time()
 sortedList = SortPerLowerBound(currentSolList)
 initialSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
-#Prints Necessarios:
-'''Ap´os a gera¸c˜ao da solu¸c˜ao inicial, e toda a vez que implementa¸c˜ao
-encontra uma solu¸c˜ao melhor que a melhor conhecida at´e o momento, esta deve escrever na sa´ıda padr˜ao: (i) a quantidade de
-segundos (com duas casas ap´os a v´ırgula) desde o come¸co da
-execu¸c˜ao; (ii) o valor dessa solu¸c˜ao; (iii) uma representa¸c˜ao da
-mesma que seja poss´ıvel de ser compreendida por um ser humano. Al´em disso, a implementa¸c˜ao tamb´em deve escrever na
-sa´ıda padr˜ao quaisquer outras inform¸c˜oes usadas para montagem
-das tabelas do relat´orio.
-'''
+
 
 
 print("initialSolution")
@@ -269,7 +285,7 @@ lastIterationImprovement = 0
 
 
 
-#Relacionado a tempo
+
 
 while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.time()-timeStart)<timeLimit)):
     #Busca local com alteracoes
@@ -283,10 +299,11 @@ while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.ti
             #print(acceptenceQueue)
             targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
             if(bestSolValue<vizinho.value):
-                print("Nova melhor sol", vizinho.value,"Meu deque é",acceptenceQueue) 
+                #print("Nova melhor sol", vizinho.value,"Meu deque é",acceptenceQueue) 
+                
                 bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
                 bestSolValue = bestSolution.value
-
+                printOnNewBestSolution(False,time.time()-timeStart, interatorCount, bestSolution)
                 lastIterationImprovement = interatorCount
     interatorCount+=1
 timeAtStopExecution = time.time()
@@ -297,7 +314,7 @@ if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por li
 elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
     print("Parada ocorreu por que chegamos no tempo maximo de execução")
 
-print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+print("Quantidade Maxima de Interacao:",stopAtInteration," Iteracao sem melhora atingida: ",(interatorCount-lastIterationImprovement), " Quantidade de iteracoes no total",interatorCount)
 print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
 
 

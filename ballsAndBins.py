@@ -1,22 +1,25 @@
 import Bin
 import Solution
-import copy
 from collections import deque 
-import heapq
 import time
-'''A primeira linha do arquivo informa o n´umero de
-recipientes (n). A segunda linha do arquivo informa o n´umero de bolas
-m. Cada linha a partir da terceira linha do arquivo at´e a linha n + 2
-possui dois n´umeros inteiros positivos: o limite inferior do recipiente i
-e o limite superior do recipiente i, respectivamente.'''
+'''
+Problema balls and bins solucionado por Late Acceptence Hill Climbing com best improvement
+
+Nomes:ANGELO  OLIVEIRA (550162), DOUGLAS  SCHLATTER(332849) e MATHEUS  FONSECA(332800)
+
+'''
 
 #Dicionário de bins, chave = id, contem tupla (lower bound e upper bound)
 binDict = {}
 
-# Open the file in read mode
-#ADICIONE O ARQUIVO A SER LIDO AQUI
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r') 
+#Coloque como input o nome do arquivo sem .txt
+#exemplo 01
+fileName = input("Nome do arquivo?: ")
 
+
+file = open(f'./inf05010_2024-2_B_TP_instances_bins-and-balls/{fileName}.txt', 'r') 
+
+#Fazemos o ordenamento no momento do calculo da solucao inicial
 def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
     if len(binList) > 1:
   
@@ -30,10 +33,6 @@ def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, in
         i = j = k = 0
   
         while i < len(L) and j < len(R):
-            # binDict[id] [0] = lowerBound bin id
-            # binDict[id] [1] = upperBound bin id
-            # L[i] = um bin
-            # L[i] [0] = valor, [1] = bolas, [2] = id
             if ((binDict[L[i][2]] [0]) < (binDict[R[j][2]] [0])):
                 binList[k] = L[i]
                 i += 1
@@ -63,11 +62,10 @@ def CalculateSolValue(solucao: list[tuple[int, int, int]]) -> int:
 def CalculateBinValue(balls: int) -> int:
     return int((balls*(balls+1))/2)
 
-#Vizinhança
+#Abaixo funcao que calcula a vizinhanca dada uma instancia de solucao
 def Border(solution: Solution, listSolution: list[tuple[int, int, int]]) -> list[Solution]:
 
     neighbors = []
-    #tagetSolution = copy.deepcopy(solution) # tem que verificar se é uma deep copy msm -> TODO talvez isso custe mto processamento
     targetSolution =  Solution.Solution(solution.value,listSolution.copy())
 
     # iBin[0] = valor
@@ -147,6 +145,7 @@ def CalculateFirstSol(sortedList: list[tuple[int, int, int]], numBalls: int, cur
 
     return Solution.Solution(CalculateSolValue(initialSol), initialSol)
 
+#Usada para comparações com a heuristica
 def BuscaLocal(solucao: Solution) -> Solution:
     bestValue = solucao.value
     bestSol = Solution.Solution(solucao.value,solucao.bins.copy())
@@ -159,45 +158,37 @@ def BuscaLocal(solucao: Solution) -> Solution:
                 bestValue = vizinho.value
                 bestSol = vizinho
                 melhorou = True
-                #break # First ou best improvement?
+                
     return bestSol
 
-
-
-#Prints Necessarios:
-'''Ap´os a gera¸c˜ao da solu¸c˜ao inicial, e toda a vez que implementa¸c˜ao
-encontra uma solu¸c˜ao melhor que a melhor conhecida at´e o momento, esta deve escrever na sa´ıda padr˜ao: (i) a quantidade de
-segundos (com duas casas ap´os a v´ırgula) desde o come¸co da
-execu¸c˜ao; (ii) o valor dessa solu¸c˜ao; (iii) uma representa¸c˜ao da
-mesma que seja poss´ıvel de ser compreendida por um ser humano. Al´em disso, a implementa¸c˜ao tamb´em deve escrever na
-sa´ıda padr˜ao quaisquer outras inform¸c˜oes usadas para montagem
-das tabelas do relat´orio.
-'''
 
 #Função utilizada no print a cada melhor solução e tambem na solução inicial
 def printOnNewBestSolution(isFirstSol,currentTime,numIteracoes,newBestSol: Solution,):
     #Se sim, eh a solução inicial
+    print("")
     if(isFirstSol):
+        print("Abaixo dados sobre a solucao inicial: ")
         print("Tempo Atual no momento do calculo da solução inicial: {:.2f}".format(currentTime))
         #print("Iteracao atual no momento do calculo da solução inicial: ")
     #Se não, encontrou uma solução melhor e precisamos printar
     else:
-        print("Nova melhor solução encontrada")
+        print("Abaixo dados sobre a melhor solucao encontrada: ")
         print("Tempo Atual no momento da melhoria: {:.2f}".format(currentTime))
         print("Quantidade total de iteracoes no momento da melhoria: ",numIteracoes)
     
     print("Valor da solucao atual: ", newBestSol.value)
-    print("Representacao da solucao atual: ")
-
+    print("Representacao da solucao melhor atual: ")
+    print("|id, Quantidade de Bolas no bin| ")
+    print("|",end = "")
     for bin in newBestSol.bins:
-     print(bin[2],",",bin[1],end='| ')
+     #print(bin[2],",",bin[1],end='| ')
+     print(f"{bin[2]},{bin[1]}",end="|")
     print("")
 
 
 lines = file.readlines()
 
-#Lista de bins contendo um index, lower bound e upper bound
-#currentBinList = []
+
 
 #Dicionário de bins, chave = id, contem tupla (lower bound e upper bound)
 #binDict = {}   #Declarado la em cima pra ser global
@@ -212,16 +203,11 @@ numBalls = int(lines[1])
 # Quantas bolas que ja foram alocadas em bins (o mínimo para aquele bin ser valido)
 currentBalls = 0
 for index in range(2,len(lines)):
-    #print(index)
-    #print (lines[index])
     targetLine=lines[index].split(" ")
     targetBin = Bin.Bin((index-1),int(targetLine[0]),int(targetLine[1]))
     binDict[(index-1)] = (int(targetLine[0]),int(targetLine[1]))
-    #Bin.SetBalls(targetBin,100)
-    #currentBinList.append(targetBin)
     minBalls = int(targetLine[0])   # Adiciona quantidade de bolas mínimas ao bin para ser válido
     currentBalls += minBalls
-    #currentSolList.append((CalculateBinValue(minBalls), minBalls, (index-1)))
     currentSolList.append((0, minBalls, (index-1)))
 
 #Antes de Começar a contagem do tempo o usuario deve inserir os parametros de execução
@@ -230,7 +216,7 @@ for index in range(2,len(lines)):
 sizeOfAcceptHeap= int(input("Qual sera o tamanho do queue de aceitacao do LAHC?: "))
 
 #Tamanho do Heap que guarda as melhores valores de solução
-stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhora?: "))
+stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhoria?: "))
 
 #Relacionado a tempo
 timeLimit = int(input("Qual sera o tempo maximo?: "))
@@ -240,9 +226,12 @@ timeStart = time.time()
 sortedList = SortPerLowerBound(currentSolList)
 initialSolution = CalculateFirstSol(sortedList, numBalls, currentBalls)
 
+timeSolInicial = time.time()-timeStart
 
-
-
+#Print da solucao inicial
+printOnNewBestSolution(True,timeSolInicial,0,initialSolution)
+'''
+#Codigo antigo para print da solucao inicial
 print("initialSolution")
 for bin in initialSolution.bins:
      print(bin,end='| ')
@@ -250,7 +239,7 @@ for bin in initialSolution.bins:
 print(initialSolution.value)
 
 print(" ")
-
+'''
 #Antes estavamos executando a buscaLocal para comparar com nossa heuristica
 '''
 buscaLocal = BuscaLocal(initialSolution)
@@ -266,10 +255,9 @@ print("valor real: ", CalculateSolValue(buscaLocal.bins))
 
 
 
-# LateAcceptanceHillClimbing
+#Abaixo esta a implementação do Late Acceptance Hill Climbing
 
 #Preparação do Heap do LAHC e Melhor solução
-
 acceptenceQueue = deque()
 #Copiamos os valores apartir das solução inicial gerada
 bestSolution = initialSolution
@@ -280,27 +268,23 @@ targetSolution = Solution.Solution(bestSolution.value,bestSolution.bins.copy())
 
 #Relacionado as iterações -> Estamos fazendo a logica de x iterações sem melhora
 interatorCount = 0
-#stopInteration = 1000 # TODO ---> aqui que vai ficar o input para colcocar o criterio de parada
 lastIterationImprovement = 0
-
-
-
-
-
 while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.time()-timeStart)<timeLimit)):
     #Busca local com alteracoes
-    #print(time.time())
     for vizinho in Border(targetSolution, targetSolution.bins):
             #Ta sobrando espaço = so adicionar
         if((acceptenceQueue[-1] <= vizinho.value) or (vizinho.value >= targetSolution.value)):
+            #se o tamanho da deque esta no maximo
             if(len(acceptenceQueue) == sizeOfAcceptHeap):
+                #de pop na ultima solucao adicionada
                 acceptenceQueue.pop()
+            #Adicione a nova solucao a esquerda
             acceptenceQueue.appendleft(vizinho.value)
-            #print(acceptenceQueue)
+            #caminhe para a nova solucao
             targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
+            #Se a solucao do vizinho eh melhor que a solucao global
             if(bestSolValue<vizinho.value):
-                #print("Nova melhor sol", vizinho.value,"Meu deque é",acceptenceQueue) 
-                
+                #Atualiza a solucao global e printa as informacoes necessarias
                 bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
                 bestSolValue = bestSolution.value
                 printOnNewBestSolution(False,time.time()-timeStart, interatorCount, bestSolution)
@@ -308,44 +292,39 @@ while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.ti
     interatorCount+=1
 timeAtStopExecution = time.time()
 print("")
+
+print("--------------------------Programa Chegou ao fim da execução-----------------------------")
 #Abaixo alguns prints monstrando qual foi o motivo da parada
 if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por limite de iterações sem melhora
     print("Parada ocorreu por que chegamos na quantidade maxima de iteração sem melhora")
 elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
     print("Parada ocorreu por que chegamos no tempo maximo de execução")
 
-print("Quantidade Maxima de Interacao:",stopAtInteration," Iteracao sem melhora atingida: ",(interatorCount-lastIterationImprovement), " Quantidade de iteracoes no total",interatorCount)
+print(f"Arquivo: {fileName}", f"TamanhoMaxQueue: {sizeOfAcceptHeap}", f"Tempo: {timeLimit}", f"Max Interações sem melhoria: {stopAtInteration}")
+
+print("Quantidade de iteracoes sem melhoria: ",(interatorCount-lastIterationImprovement)," Total de Iteracoes Atingida: ",(interatorCount))
 print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
 
 
 
-print("")
+
+#Print da solucao inicial:
+printOnNewBestSolution(True,timeSolInicial,0,initialSolution)
+#Print da melhor solução encontrada:
+printOnNewBestSolution(False,timeAtStopExecution-timeStart,lastIterationImprovement,bestSolution)
+'''#prints antigos de fim de programa
+
+    print("")
 print("Initial Sol Value: ",initialSolution.value)
 print("Best Sol Value: ",bestSolution.value)
 print("bestSolution")
 for bin in bestSolution.bins:
      print(bin,end='| ')
-        #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-
-#print(bestSolution.value)
-
 #Comparação com busca local
 #print("busca local: ", buscaLocal.value)
+'''
 
-'''
-print("Vizinhos")
-vizinhos = Border(targetSolution, sortedList)
-for i in range(0,len(vizinhos)):
-    print(" ")
-    print("Sol", i, "=", vizinhos[i].value)
-    for iBin in vizinhos[i].bins:
-        print(f"({iBin[2]})= {iBin[1]}",end='| ')
-        #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-print(len(vizinhos))
-#for iBin in sortedList:
-for iBin in targetSolution.bins:
-    print(iBin.id, " ",iBin.lowerLimit)
-        #Todo colocar aqui o vetor que guarda o lower e upper de cada bin
-#print(CalculateSolValue(currentBinList))    
-'''
+
+
+
     

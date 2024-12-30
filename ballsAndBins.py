@@ -13,6 +13,10 @@ e o limite superior do recipiente i, respectivamente.'''
 #Dicionário de bins, chave = id, contem tupla (lower bound e upper bound)
 binDict = {}
 
+# Open the file in read mode
+#ADICIONE O ARQUIVO A SER LIDO AQUI
+file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r') 
+
 def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
     if len(binList) > 1:
   
@@ -166,8 +170,7 @@ def printOnNewBestSolution(currentTime,newBestSol: Solution,):
     for bin in newBestSol.bins:
      print(bin,end='| ')
 
-# Open the file in read mode
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r')
+
 lines = file.readlines()
 
 #Lista de bins contendo um index, lower bound e upper bound

@@ -15,7 +15,11 @@ binDict = {}
 
 # Open the file in read mode
 #ADICIONE O ARQUIVO A SER LIDO AQUI
-file = open('./inf05010_2024-2_B_TP_instances_bins-and-balls/01.txt', 'r') 
+
+fileName = input("Nome do arquivo?: ")
+
+
+file = open(f'./inf05010_2024-2_B_TP_instances_bins-and-balls/{fileName}', 'r') 
 
 def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
     if len(binList) > 1:
@@ -297,7 +301,9 @@ if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por li
 elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
     print("Parada ocorreu por que chegamos no tempo maximo de execução")
 
-print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+print(f"Arquivo: {fileName}", f"TamanhoQueue: {sizeOfAcceptHeap}", f"Tempo: {timeLimit}", f"Max Interações sem melhora: {stopAtInteration}")
+
+print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount))
 print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
 
 

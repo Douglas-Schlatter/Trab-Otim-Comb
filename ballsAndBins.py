@@ -162,11 +162,10 @@ def BuscaLocal(solucao: Solution) -> Solution:
                 #break # First ou best improvement?
     return bestSol
 
-def LateAcceptanceHillClimbing():
-    return 0
+
 
 def printOnNewBestSolution(currentTime,newBestSol: Solution,):
-
+    print()
     for bin in newBestSol.bins:
      print(bin,end='| ')
 
@@ -204,7 +203,7 @@ for index in range(2,len(lines)):
 #Antes de Começar a contagem do tempo o usuario deve inserir os parametros de execução
 
 #Tamanho do Heap que guarda as melhores valores de solução
-sizeOfAcceptHeap= int(input("Qual sera o tamanho do heap de aceitacao do LAHC?: "))
+sizeOfAcceptHeap= int(input("Qual sera o tamanho do queue de aceitacao do LAHC?: "))
 
 #Tamanho do Heap que guarda as melhores valores de solução
 stopAtInteration = int(input("Qual sera a quantidade maxima de iteracoes sem melhora?: "))
@@ -284,7 +283,7 @@ while(((interatorCount-lastIterationImprovement)<stopAtInteration) and ((time.ti
             #print(acceptenceQueue)
             targetSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
             if(bestSolValue<vizinho.value):
-                print("Nova melhor sol", vizinho.value,"Meu heap é",acceptenceQueue) 
+                print("Nova melhor sol", vizinho.value,"Meu deque é",acceptenceQueue) 
                 bestSolution = Solution.Solution(vizinho.value,vizinho.bins.copy())
                 bestSolValue = bestSolution.value
 
@@ -295,10 +294,13 @@ print("")
 #Abaixo alguns prints monstrando qual foi o motivo da parada
 if(((interatorCount-lastIterationImprovement)>=stopAtInteration)):#Parada por limite de iterações sem melhora
     print("Parada ocorreu por que chegamos na quantidade maxima de iteração sem melhora")
-    print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
 elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo 
     print("Parada ocorreu por que chegamos no tempo maximo de execução")
-    print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
+
+print("Quantidade Maxima:",stopAtInteration," Iteração Atingida: ",(interatorCount-lastIterationImprovement))
+print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
+
+
 
 print("")
 print("Initial Sol Value: ",initialSolution.value)

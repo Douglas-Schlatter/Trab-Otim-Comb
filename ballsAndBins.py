@@ -303,7 +303,7 @@ elif((time.time()-timeStart)>=timeLimit):# Parada por limite de tempo
 print(f"Arquivo: {fileName}", f"TamanhoMaxQueue: {sizeOfAcceptHeap}", f"Tempo: {timeLimit}", f"Max Interações sem melhoria: {stopAtInteration}")
 
 print("Quantidade de iteracoes sem melhoria: ",(interatorCount-lastIterationImprovement)," Total de Iteracoes Atingida: ",(interatorCount))
-print("Tempo Maximo:",timeLimit," Iteração Atingida: ",(timeAtStopExecution-timeStart))
+print("Tempo Maximo:",timeLimit," Tempo total: ",f"{timeAtStopExecution-timeStart:.2f}")
 
 
 

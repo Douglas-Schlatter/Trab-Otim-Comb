@@ -17,7 +17,7 @@ binDict = {}
 fileName = input("Nome do arquivo?: ")
 
 
-file = open(f'./inf05010_2024-2_B_TP_instances_bins-and-balls/{fileName}.txt', 'r') 
+file = open(f'./{fileName}', 'r') 
 
 #Fazemos o ordenamento no momento do calculo da solucao inicial
 def SortPerLowerBound(binList: list[tuple[int, int, int]]) -> list[tuple[int, int, int]]:
